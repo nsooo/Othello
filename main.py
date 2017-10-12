@@ -2,28 +2,16 @@
 
 class Othello:
     def __init__(self, squares):
-        self.player = 1
-        self.squares = squares
-        self.board = [['.' for i in range(squares)] for j in range(squares)]
-        """self.board[(squares//2)-1][(squares//2)-1] = 'x'
-        self.board[(squares//2)][(squares//2)-1] = 'o'
-        self.board[(squares//2)-1][squares//2] = 'o'
-        self.board[squares//2][squares//2] = 'x'"""
-        self.board[2][2] = 'x'
-        self.board[2][3] = 'x'
-        self.board[2][4] = 'x'
-        self.board[3][2] = 'x'
-        self.board[4][2] = 'x'
-        self.board[3][4] = 'x'
-        self.board[4][4] = 'x'
-        self.board[4][3] = 'x'
-        self.board[1][1] = 'o'
-        self.board[1][2] = 'o'
-        self.board[1][3] = 'o'
-        self.board[1][4] = 'o'
-        self.board[1][5] = 'o'
-
-
+        if (squares % 2 != 0):
+            self.squares = squares
+        else:
+            self.player = 1
+            self.squares = squares
+            self.board = [['.' for i in range(squares)] for j in range(squares)]
+            self.board[(squares//2)-1][(squares//2)-1] = 'x'
+            self.board[(squares//2)][(squares//2)-1] = 'o'
+            self.board[(squares//2)-1][squares//2] = 'o'
+            self.board[squares//2][squares//2] = 'x'
 
     def printBoard(self):
         for i in range(self.squares):
@@ -135,7 +123,6 @@ class Othello:
 
 
     def checkNorth(self, posX, posY, player, check):
-        print("posY",posY)
         if (posY < 0):
             return False
         else:
@@ -340,7 +327,6 @@ class Othello:
         cordinatesOfMoves = []
         for i in range(self.squares):
             for j in range(self.squares):
-                #1,3 valid move
                 if (self.board[i][j] == '.'):
                     if (self.checkWest(i-1,j,player,False)):
                         cordinatesOfMoves.append((i,j))
@@ -354,51 +340,82 @@ class Othello:
                         cordinatesOfMoves.append((i,j))
                     if (self.checkNorthEast(i+1,j-1,player,False)):
                         cordinatesOfMoves.append((i,j))
-                    if (self.checkSouthWest(i+1,j+1,player,False)):
+                    if (self.checkSouthWest(i-1,j+1,player,False)):
                         cordinatesOfMoves.append((i,j))
-                    if (self.checkSouthEast(i-1,j+1,player,False)):
+                    if (self.checkSouthEast(i+1,j+1,player,False)):
                         cordinatesOfMoves.append((i,j))
+        return list(set(cordinatesOfMoves))
 
 
+    def checkWinner(self):
+        player1Moves = []
+        player1Moves = self.displayMoves(1)
+        player2Moves = []
+        player2Moves = self.displayMoves(2)
+        if (player1Moves == [] and player2Moves == []):
+            return True
+        else:
+            return False
 
-
-
-        return cordinatesOfMoves
+    def countBoard(self):
+        player1 = 0
+        player2 = 0
+        for i in range(self.squares):
+            for j in range(self.squares):
+                if (self.board[i][j] == 'x'):
+                    player1 += 1
+                elif (self.board[i][j] == 'o'):
+                    player2 += 1
+        return player1, player2
 
 
     def game(self):
-        winner = False
-        tie = False
-        while not(winner or tie):
-            self.printBoard()
-            pos = input(("Player {}, place your tile: ").format(self.player))
-            if (pos == 'n'):
-                listOfMoves = self.displayMoves(self.player)
-                print(listOfMoves)
-            elif (pos == "help"):
-                print("type n to know your available moves or k if you don't have a move.")
-            elif (pos == 'k'):
-                listOfMoves = self.displayMoves(self.player)
-                if (listOfMoves == []):
-                    if (self.player == 1):
-                        self.player = 2
+        if (self.squares % 2 != 0):
+            print("The board must have an even integer.")
+        else:
+            print("Type '?' to get available commands.")
+            winner = False
+            while not(winner):
+                self.printBoard()
+                pos = input(("Player {}, place your tile: ").format(self.player))
+                if (pos == 'n'):
+                    listOfMoves = self.displayMoves(self.player)
+                    print(listOfMoves)
+                elif (pos == "?"):
+                    print("type n to get a list of your possible moves or k if you don't have any moves.")
+                elif (pos == 'k'):
+                    listOfMoves = self.displayMoves(self.player)
+                    if (listOfMoves == []):
+                        print("Changed player turn.")
+                        if (self.player == 1):
+                            self.player = 2
+                        else:
+                            self.player = 1
                     else:
-                        self.player = 1
+                        print("There are available move(s), please chose one.")
                 else:
-                    print("There are available moves, please chose one.")
-            elif (pos != 'n' and pos != "help"):
-                try:
-                    pos = pos.split(",")
-                    if (self.legalMove(int(pos[0]), int(pos[1]), self.player)):
-                        print("player",self.player)
-                except ValueError:
-                    print("Write your cordinates in the form of 'x,y'.")
+                    try:
+                        pos = pos.split(",")
+                    except ValueError:
+                        print("Write your cordinates in the form of 'x,y'.")
+
+                    else:
+                        if (self.legalMove(int(pos[0]), int(pos[1]), self.player)):
+                            winner = self.checkWinner()
+            self.printBoard()
+            player1, player2 = self.countBoard()
+            if (player1 > player2):
+                print("Player 1 is the winner with", player1, "to", player2, "tiles!")
+            elif (player1 < player2):
+                print("Player 2 is the winner with", player2, "to", player1, "tiles!")
+            else:
+                print("It's a tie!")
 
 
-
-
-
-
-
-myGame = Othello(8)
-myGame.game()
+try:
+    number = int(input("How big should the board be, n x n: "))
+except ValueError:
+    print("The board size must be an integer.")
+else:
+    myGame = Othello(number)
+    myGame.game()
