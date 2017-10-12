@@ -392,7 +392,7 @@ class Othello:
                         else:
                             self.player = 1
                     else:
-                        print("There are available move(s), please chose one.")
+                        print("There are available move(s), please choose one.")
                 else:
                     try:
                         pos = pos.split(",")
