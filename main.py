@@ -23,11 +23,14 @@ class Othello:
     def placePiece(self, posX, posY, player):
         if player == 1:
             self.board[posX][posY] = 'x'
-            self.player = 2
         else:
             self.board[posX][posY] = 'o'
-            self.player = 1
 
+    def changePlayer(self, player):
+        if player == 1:
+            self.player = 2
+        else:
+            self.player = 1
 
     def checkWest(self, posX, posY, player, check):
         if (posX < 0):
@@ -318,6 +321,10 @@ class Othello:
                 self.placePiece(posX, posY, player)
                 self.flipSouthWest(posX-1, posY+1, player)
                 legal = True
+
+            if (legal):
+                self.changePlayer(player)
+
             return legal
         else:
             return False
@@ -387,30 +394,31 @@ class Othello:
                     listOfMoves = self.displayMoves(self.player)
                     if (listOfMoves == []):
                         print("Changed player turn.")
-                        if (self.player == 1):
-                            self.player = 2
-                        else:
-                            self.player = 1
+                        self.changePlayer(self.player)
                     else:
                         print("There are available move(s), please choose one.")
                 else:
                     try:
                         pos = pos.split(",")
+                        pos[0] = int(pos[0])
+                        pos[1] = int(pos[1])
                     except ValueError:
                         print("Write your cordinates in the form of 'x,y'.")
-
+                    except IndexError:
+                        print("You forgot the x or the y on your move.")
                     else:
-                        if (self.legalMove(int(pos[0]), int(pos[1]), self.player)):
+                        if (pos[0] < 0 or pos[0] > self.squares-1 or pos[1] < 0 or pos[1] > self.squares-1):
+                            print("Your x and your y must be between 0 and {}.".format(self.squares-1))
+                        elif (self.legalMove(pos[0], pos[1], self.player)):
                             winner = self.checkWinner()
             self.printBoard()
             player1, player2 = self.countBoard()
             if (player1 > player2):
-                print("Player 1 is the winner with", player1, "to", player2, "tiles!")
+                print("Player 1 is the winner with {} to {} tiles!".format(player1, player2))
             elif (player1 < player2):
-                print("Player 2 is the winner with", player2, "to", player1, "tiles!")
+                print("Player 2 is the winner with {} to {} tiles!".format(player2, player1))
             else:
                 print("It's a tie!")
-
 
 try:
     number = int(input("How big should the board be, n x n: "))
