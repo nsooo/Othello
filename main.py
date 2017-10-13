@@ -2,7 +2,7 @@
 
 class Othello:
     def __init__(self, squares):
-        if (squares % 2 != 0):
+        if (squares % 2 != 0 or squares < 4):
             self.squares = squares
         else:
             self.player = 1
@@ -370,8 +370,8 @@ class Othello:
 
 
     def game(self):
-        if (self.squares % 2 != 0):
-            print("The board must have an even integer.")
+        if (self.squares % 2 != 0 or self.squares < 4):
+            print("The board must have an even integer and minimum a 4.")
         else:
             print("Type '?' to get available commands.")
             winner = False
